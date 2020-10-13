@@ -1,0 +1,147 @@
+# 服务器信息
+server:
+  address: localhost
+  port: 80
+
+# spring应用信息
+spring:
+  application:
+    name: gateway-server
+   # 指定激活的profile配置
+  profiles:
+    active: discovery # 如果配置了多个，比如directUri,discovery，相同的属性只有最后一个有效
+
+  # redis配置，用于服务限流
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+
+# 直接指定要路由的目标服务器uri的方式进行路由
+---
+# hystrix熔断配置
+hystrix:
+  command:
+    default: # default表示缺省，匹配所有的熔断器
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 20000 # 超时20秒启动熔断器
+
+spring:
+  cloud:
+    gateway:
+      # 定义全局过滤器（工厂）
+      default-filters:
+        - RequestTime=true # 自定义的过滤器工厂：打印请求处理时间以及参数
+      # 定义路由
+      routes:
+        - id : micro-service-consumer # 路由名称
+          uri: http://localhost:8082 # 目标路由uri
+          # 配置断言
+          predicates:
+#            - Header=X-Request-Id, \d+ # 断言header信息：要求有X-Request-Id字段且为数字
+#            - Cookie=service,micro-service-consumer # 断言cookie值：名字为service其值为micro-service-consumer
+            - Method=GET # 断言请求方法：限定GET方法
+            - Path=/api/v1/consumer/** # 断言请求路径：限定以/api/v1/consumer/开头的请求路径，多个可以使用逗号隔开
+          # 配置过滤器
+          filters:
+            - AddRequestHeader=X-Rquest-Id,123456 # 添加一个header信息，请求头名字为X-Rquest-Id，值为123456
+            - RewritePath=/api/v1/consumer/(?<segment>.*), /$\{segment} # 重写路径：过滤掉/api/v1/consumer再进行路由
+
+        - id : micro-service-provider
+          uri: http://localhost:8080
+          predicates:
+            - Method=GET
+            - Path=/api/v1/provider/**
+          filters:
+            - StripPrefix=3 # 截掉Path的前3层目录，即截掉/api/v1/provider再进行路由
+  # profile名称
+  profiles: directUri
+# 测试:curl http://localhost/api/v1/consumer/greeting/Sam -H "X-Request-Id:123456" -H "Cookie:service=micro-service-consumer"
+# 或：curl http://localhost/api/v1/consumer/greeting/Sam -H "X-Request-Id:123456" -b service=micro-service-consumer
+# 或：curl http://localhost/api/v1/consumer/greeting/Sam -H "X-Request-Id:123456" -b "service=micro-service-consumer"
+# 错误测试（POST）：curl -X POST http://localhost/api/v1/provider/greeting/Sam
+
+# 使用服务发现来获取目标服务器进行路由
+---
+# eureka设置
+eureka:
+  instance:
+    hostname: ${server.address}
+    instance-id: ${spring.application.name}:${server.address}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:2000/eureka # 注册中心服务地址，集群用逗号分隔
+
+# hystrix熔断配置
+hystrix:
+  command:
+    micro-service-provider: # 熔断命令名称micro-service-provider，用于接下来指定熔断器
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000 # 超时10秒启动熔断器
+
+spring:
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false # 关闭负载均衡器的ribbon，解决一些警告
+    gateway:
+      # 使用服务发现
+      discovery:
+        locator:
+          # 1.true表示为注册中心的每一个服务都在本地创建一个路由，相当于
+          #routes:
+          #  - id : 服务名
+          #    uri: lb://服务名
+          #    predicates:
+          #      - Path=/服务名/**
+          #    filters:
+          #      - StripPrefix=1
+          # 2.false表示自定义路由
+          enabled: false
+          lowerCaseServiceId: true # 服务名小写
+      routes:
+        # 1、服务消费者路由
+        - id : micro-service-consumer
+          # 启用了服务发现后，这里填写负载均衡://服务名
+          uri: lb://micro-service-consumer
+          predicates:
+            - Method=GET
+            - Path=/greeting/feign/**,/greeting/lbrest/**,/greeting/rest/**,/greeting/** # 不使用前缀，直接使用真实请求路径
+          filters:
+            - RequestTime=true # 自定义的过滤器工厂：打印请求处理时间以及参数
+
+        # 2、服务提供者路由
+        - id : micro-service-provider
+          uri: lb://micro-service-provider
+          predicates:
+            - Method=GET
+            - Path=/api/v1/provider/**
+          filters:
+            - StripPrefix=3 # 截掉Path的前三层目录，比如/api/v1/provider
+            - RequestTime=true
+            # 配置熔断过滤器
+            - name: Hystrix
+              args:
+                name: micro-service-provider # 熔断命令名称
+                fallbackUri: forward:/provider/hystrix # 在网关内部转发到/provider/hystrix进行处理，可以实现一个Controller返回结果提示，比如正在更新，或重试提醒，也可以定义另外一个路由转发到其它应用处理，见下方的3、处理熔断的路由
+            # 限流过滤器
+            - name: RequestRateLimiter
+              args:
+                key-resolver: '#{@uriKeyResolver}' # 需要定义此bean
+                redis-rate-limiter:
+                  replenishRate: 10
+                  burstCapacity: 30
+
+        # 3、处理熔断的路由
+        - id: micro-service-provider-hystrix
+          uri: http://localhost:5000 # 比如路由到一个更新提示页面
+          predicates:
+            - Path=/provider/hystrix # 拦截服务提供者服务熔断路由
+  profiles: discovery
+# curl http://localhost/greeting/Sam、curl http://localhost/greeting/feign/Sam、
+# curl http://localhost/greeting/lbrest/Sam、curl http://localhost/greeting/rest/Sam、
+# curl http://localhost/api/v1/provider/greeting/Sam

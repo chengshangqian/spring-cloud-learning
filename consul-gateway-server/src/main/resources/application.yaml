@@ -1,0 +1,43 @@
+# 服务器信息
+server:
+  address: localhost
+  port: 80
+
+# spring应用信息
+spring:
+  application:
+    name: consul-gateway-server
+
+  # cloud设置
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false # 关闭负载均衡器的ribbon，解决一些警告
+    # consul配置
+    consul:
+      host: localhost
+      port: 8500
+      # 服务注册与发现
+      discovery:
+        register: false #是否注册到注册中心：false表示不注册，只发现服务
+        serviceName: ${spring.application.name}
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+
+    # gateway配置
+    gateway:
+      # 定义路由
+      routes:
+        - id: consul-micro-service-provider
+          # 启用了服务发现后，这里填写负载均衡://服务名
+          uri: lb://consul-micro-service-provider
+          predicates:
+            - Method=GET
+            - Path=/user/** # 也可以配合StripPrefix使用一个统一前缀/api/**替换写多个Path
+          #filters:
+          #  - StripPrefix=1 # 截掉Path的第一层目录，比如/api
+        - id: consul-micro-service-consumer
+          uri: lb://consul-micro-service-consumer
+          predicates:
+            - Method=GET
+            - Path=/student/**

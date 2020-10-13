@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <title>登录</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/css/main.css" th:href="@{/css/main.css}" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+</head>
+<body>
+<h1>登录页面</h1>
+<p>用户示例: 用户账号 / 密码</p>
+<p th:if="${loginError}" class="error">错误的账号或密码</p>
+<form th:action="@{/login}" method="post">
+    <label for="username">用户账号</label>:
+    <input type="text" id="username" name="username" autofocus="autofocus" value="admin"/> <br />
+    <label for="password">用户密码</label>:
+    <input type="password" id="password" name="password" value="123456" /> <br />
+    <input type="text" name="captcha" value="" /> <br />
+    <img src="/captcha.jpg" alt="captcha" style="width:150px;height:50px;" /> <br />
+    <input type="checkbox" name="remember-me" value="true" checked="checked" />记住我 <br />
+    <input type="submit" value="登录" />
+</form>
+<p><a href="/index" th:href="@{/index}">回到首页</a></p>
+</body>
+</html>

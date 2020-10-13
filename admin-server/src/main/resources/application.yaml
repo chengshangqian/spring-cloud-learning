@@ -1,0 +1,36 @@
+# 服务器信息
+server:
+  address: localhost
+  port: 5000
+
+# spring应用信息
+spring:
+  application:
+    name: admin-server
+
+  # cloud设置
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false # 关闭负载均衡器的ribbon，解决一些警告
+
+  # security配置
+  security:
+    user:
+      name: admin # 配置可认证登录服务器的账号密码
+      password: 123456
+
+# eureka设置
+eureka:
+  instance:
+    lease-renewal-interval-in-seconds: 10 # 每隔10秒向注册中心续约
+    health-check-url-path: /actuator/health # 健康检查url
+    hostname: ${server.address}
+    instance-id: ${spring.application.name}:${server.address}:${server.port} # 自定义注册到eureka中的服务实例instance-id，在eureka后台显示
+    metadata-map:
+      user.name: ${spring.security.user.name} # eureka调用当前应用进行健康检查url或api接口时，进行认证登录所需的账号密码
+      user.password: ${spring.security.user.password}
+  client:
+    registry-fetch-interval-seconds: 5 # 每5秒从注册中心拉取一次服务列表
+    serviceUrl:
+      defaultZone: http://localhost:2000/eureka # 注册中心服务地址，集群用逗号分隔

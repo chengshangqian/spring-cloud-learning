@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <title>首页</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/css/main.css" th:href="@{/css/main.css}" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+</head>
+<body>
+<div th:fragment="logout" class="logout" sec:authorize="isAuthenticated()">
+    已经登录用户: <span sec:authentication="name"></span> |
+    角色: <span sec:authentication="principal.authorities"></span>
+    <div>
+        <form action="#" th:action="@{/logout}" method="post">
+            <input type="submit" value="Logout" />
+        </form>
+    </div>
+</div>
+<h1>应用首页</h1>
+<p>应用首页不需要认证授权，你可以点击下面的连接查看需要认证授权的用户首页.</p>
+<ul>
+    <li>查看受保护的 <a href="/user/index" th:href="@{/user/index}">用户首页</a></li>
+    <li>查看受保护的 <a href="/admin/index" th:href="@{/admin/index}">管理员首页</a></li>
+    <li>查看开放的 <a href="/api/user/list" th:href="@{/api/user/list}">用户服务API文档</a></li>
+</ul>
+</body>
+</html>

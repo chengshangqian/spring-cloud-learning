@@ -1,0 +1,32 @@
+# 服务器信息
+server:
+  address: localhost
+  port: 6001
+
+# spring应用信息
+spring:
+  application:
+    name: config-client
+
+  # cloud设置
+  cloud:
+    # 配置中心
+    config:
+      #uri: http://localhost:6000 # 配置中心地址，这种方式，可以把eureka配置也放到配置中心
+      fail-fast: true # 开启快速失败策略
+      discovery:
+        enabled: true
+        serviceId: config-server # 启用服务发现，而不是直连配置中心
+
+  # 激活配置
+  profiles:
+    active: pro # 读取配置中心的文件为：{spring.application.name}-{spring.profiles.active}.yaml
+
+# eureka配置
+eureka:
+  instance:
+    hostname: ${server.address}
+    instance-id: ${spring.application.name}:${server.address}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:2000/eureka # 注册中心服务地址，集群用逗号分隔

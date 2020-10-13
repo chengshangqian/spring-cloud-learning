@@ -1,0 +1,52 @@
+# 服务器信息
+server:
+  address: localhost
+  port: 80
+
+# spring应用信息
+spring:
+  application:
+    name: zuul-server
+
+# eureka设置
+eureka:
+  instance:
+    hostname: ${server.address}
+    instance-id: ${spring.application.name}:${server.address}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:2000/eureka # 注册中心服务地址
+
+# hystrix熔断配置
+hystrix:
+  command:
+    default: # 缺省匹配所有的熔断器，可以定义路由中配置的熔断器名称来指定具体的路由的熔断配置
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 20000 # 超时20秒启动熔断器
+
+# ribbon负载均衡配置
+ribbon:
+  ReadTimeout: 20000
+  ConnectTimeout: 20000
+
+# zuul路由网关配置
+zuul:
+  # 配置全局的前缀/api/v1
+  prefix: /api/v1
+  routes:
+    # /consumer开头的请求路由到micro-service-consumer：全局前缀/api/v1以及/waitress在执行路由时会被截取掉，即/**部分为micro-service-consumer服务的真实api路径
+    consumer:
+      path: /consumer/**
+      serviceId: micro-service-consumer
+      sensitiveHeaders: # 置空sensitiveHeaders属性，让请求安全头的敏感信息可以转发，以完成后端服务中的安全认证
+    # /provider开头的请求路由到micro-service-provider
+    provider:
+      path: /provider/**
+      serviceId: micro-service-provider
+      sensitiveHeaders:
+
+logging:
+  level:
+    com.fandou.coffee.learning.springcloud.zuul.server: DEBUG

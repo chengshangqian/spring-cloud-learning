@@ -1,0 +1,81 @@
+# 服务器信息
+server:
+  address: localhost
+  port: 8080
+
+# spring应用信息
+spring:
+  application:
+    name: micro-service-provider
+
+  # sleuth设置
+  sleuth:
+    web:
+      client:
+        enabled: true
+    sampler:
+      probability: 1.0 # 采样比例100%，默认是0.1
+
+  # zipkin设置
+  zipkin:
+    sender:
+      type: rabbit
+#    base-url: http://localhost:9411 # 使用http直接发送链路数据到zipkin服务器地址
+
+  # rabbitmq设置：使用rabbitmq发送链路数据
+  rabbitmq:
+    host: localhost
+    username: sqcheng
+    password: 123456
+    port: 5672
+
+  # cloud设置
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false # 关闭负载均衡器的ribbon，解决一些警告
+
+# eureka设置
+eureka:
+  instance:
+    hostname: ${server.address}
+    instance-id: ${spring.application.name}:${server.address}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:2000/eureka # 注册中心服务地址，集群用逗号分隔
+
+# actuator监控管理配置
+management:
+  # 配置端点
+  endpoint:
+    health:
+      show-details: ALWAYS # 健康信息端点显示详情
+    shutdown:
+      enabled: false # 开启关闭应用的端点
+
+  # 曝露断点（配置）
+  endpoints:
+    web:
+      exposure:
+        include: "*" # 曝露所有端点
+  #server:
+    #port: 9000 # 监控端口使用9000,与应用程序端口8080区别开
+
+# feign配置
+feign:
+  hystrix:
+    enabled: true # 远程调用开启hystrix熔断功能进行服务降级,否则fallback指定的Mock无法启用
+
+# hystrix-dashboard配置
+hystrix:
+  dashboard:
+    proxy-stream-allow-list: ${server.address}
+
+# swagger3.0 在线API文档
+#springfox:
+#  documentation:
+    # 关闭ui
+#    swagger-ui:
+#      enabled: false
+    # 关闭自动启动扫描注解
+#    auto-startup: false

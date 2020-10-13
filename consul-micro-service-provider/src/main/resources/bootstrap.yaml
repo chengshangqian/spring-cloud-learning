@@ -1,0 +1,36 @@
+# 服务器信息：演示从consul获取服务器端口号
+server:
+  address: localhost
+#  port: 8080 # 端口尝试从consul获取
+
+# spring应用信息
+spring:
+  application:
+    name: consul-micro-service-provider
+
+  # 激活consul配置中心对应的profile
+  profiles:
+    active: dev
+
+  # cloud设置
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false # 关闭负载均衡器的ribbon，解决一些警告
+    # consul配置
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        serviceName: ${spring.application.name} # 服务名称
+        health-check-path: /actuator/health # 健康检查路径
+        health-check-interval: 10s
+      # consul作为配置中心：演示consul上获取配置的server.port
+      # 以下配置，需要在consul上创建key为 ${prefix}/${serviceName}${profile-separator}${profiles.active}/{data-key}的yaml格式的数据
+      # 即创建key为config/consul-micro-service-provider:dev/data，在创建页面输入具体的符合yaml格式的属性配置
+      config:
+        enabled: true # 开启consul作为配置中心
+        format: yaml # 创建的配置内容格式为yaml
+        prefix: config # 标识当前应用配置的key的前缀
+        profile-separator: ":" # 配置文件分隔符，即key中，分隔符后的字符串就是要激活的profile名称
+        data-key: data # 配置数据的开始，key的结束，之后就是配置的属性内容

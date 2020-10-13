@@ -1,0 +1,94 @@
+# 服务器信息
+server:
+  address: localhost
+  port: 5001
+  servlet:
+    session:
+      timeout: 3600 # 支持JDB8中Duration类格式的事件，否则为秒
+
+# spring应用信息
+spring:
+  application:
+    name: admin-client
+
+  # 数据源配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    address: localhost:3306
+    url: jdbc:mysql://${spring.datasource.address}/vblog?useUnicode=true&zeroDateTimeBehavior=convertToNull&autoReconnect=true&characterEncoding=utf-8
+    username: coffee
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # cloud设置
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false # 关闭负载均衡器的ribbon，解决一些警告
+
+  # session配置
+  session:
+    store-type: redis # 使用redis存储session
+
+  # redis配置
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+    password:
+    #jedis:
+    pool.max-active: 8
+    pool.max-idle: 8
+    pool.max-wait: -1ms
+    pool.min-idle: 0
+    timeout: 3000
+
+# spring-boot-admin配置
+#  boot:
+#    admin:
+#      client:
+#        url: http://localhost:5000 # 服务器端地址
+#        instance:
+#          prefer-ip: true # 使用ip代替hostname与服务端通信，否则默认时localhost或本地地址，客户端和服务端分开时将无法通信
+#          service-url: http://${server.address}:${server.port}
+
+  # thymeleaf设置
+  thymeleaf:
+    mode: HTML5
+    encoding: UTF-8
+    cache: false
+    prefix: classpath:/templates/
+    servlet:
+      content-type: text/html
+    suffix: .html
+
+# eureka设置
+eureka:
+  instance:
+    hostname: ${server.address} # 如果SpringBootAdmin服务端和客户端不在同一台机，这里需要注册为可通讯的IP地址
+    lease-renewal-interval-in-seconds: 10
+    health-check-url-path: /actuator/health
+    instance-id: ${spring.application.name}:${server.address}:${server.port}
+  client:
+    registry-fetch-interval-seconds: 5
+    serviceUrl:
+      defaultZone: http://localhost:2000/eureka # 注册中心服务地址
+
+# actuator配置
+management:
+  # 配置端点
+  endpoint:
+    health:
+      show-details: ALWAYS # 健康信息端点显示详情
+    shutdown:
+      enabled: false # 是否开启关闭应用的端点
+
+  # 曝露断点（配置）
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    com.fandou.coffee.learning.springcloud.admin.client: DEBUG

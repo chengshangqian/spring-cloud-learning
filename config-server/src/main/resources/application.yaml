@@ -1,0 +1,40 @@
+# 服务器信息
+server:
+  address: localhost
+  port: 6000
+
+# spring应用信息
+spring:
+  application:
+    name: config-server
+
+  # cloud设置
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false # 关闭负载均衡器的ribbon，解决一些警告
+    # 配置中心
+    config:
+      server:
+        native: # 配置从本地读取配置
+          search-locations: classpath:/shared # 配置文件存放的位置
+#        git: # 从git远程仓库获取配置文件，下面是github,注意git仓库内容也会一并被下载，要快速拉取，建议git仓库不要存放其它文件
+#          uri: https://github.com/chengshangqian/spring-cloud-config
+#          search-paths: /** # 查找目录，更目录可以用/**
+#          default-label: main # 分支
+#          basedir: D:\tmp\git\config # 拉取到本地存放的目录
+#          # 公开库可以不填写username和password，如果是私有项目，则需要账号和密码
+#          #username: chengshangqian@126.com
+#          #password: github2020
+
+  profiles:
+    active: native # 从本地读取
+
+# eureka注册中心配置
+eureka:
+  instance:
+    hostname: ${server.address}
+    instance-id: ${spring.application.name}:${server.address}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:2000/eureka # 注册中心服务地址，集群用逗号分隔

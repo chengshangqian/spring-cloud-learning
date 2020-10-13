@@ -1,0 +1,13 @@
+package com.fandou.coffee.learning.springcloud.consul.gateway;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+@SpringBootApplication
+@EnableDiscoveryClient // 开启Consul服务发现
+public class ConsulGatewayServerApp {
+    public static void main(String[] args) {
+        SpringApplication.run(ConsulGatewayServerApp.class,args);
+    }
+}

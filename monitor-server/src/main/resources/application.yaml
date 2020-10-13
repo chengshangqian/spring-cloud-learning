@@ -1,0 +1,32 @@
+# 服务器信息
+server:
+  address: localhost
+  port: 9000
+
+# spring应用信息
+spring:
+  application:
+    name: monitor-server
+
+# eureka设置
+eureka:
+  instance:
+    hostname: ${server.address}
+    instance-id: ${spring.application.name}:${server.address}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:2000/eureka # 注册中心服务地址，集群用逗号分隔
+
+# hystrix-dashboard配置
+hystrix:
+  dashboard:
+    proxy-stream-allow-list: ${server.address} # 允许代理调用获取数据流的主机列表，配置不当可能无法调用/turbine.stream接口获取熔断信息
+
+# turbine配置：监控多个服务的熔断情况
+turbine:
+  combine-host-port: true
+  app-config: micro-service-consumer,micro-service-provider # 要监控多个应用可以使用逗号隔开
+  cluster-name-expression: new String("default") # 集群名字
+  aggregator:
+    cluster-config: default
+  instanceUrlSuffix: /actuator/hystrix.stream # 调用被监控服务的数据流接口地址，缺省/actuator/hystrix.stream

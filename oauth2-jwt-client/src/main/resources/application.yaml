@@ -1,0 +1,50 @@
+# 服务器信息
+server:
+  address: localhost
+  port: 5998
+
+# spring应用信息
+spring:
+  application:
+    name: oauth2-jwt-client
+
+  # 配置数据源
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    address: localhost:3306
+    url: jdbc:mysql://${spring.datasource.address}/vblog?useUnicode=true&zeroDateTimeBehavior=convertToNull&autoReconnect=true&characterEncoding=utf-8
+    username: coffee
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # cloud设置
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false # 关闭负载均衡器的ribbon，解决一些警告
+
+# eureka设置
+eureka:
+  instance:
+    hostname: ${server.address}
+    instance-id: ${spring.application.name}:${server.address}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:2000/eureka # 注册中心服务地址
+
+# feign配置：开启熔断器功能
+feign:
+  hystrix:
+    enable: true
+
+# security配置(自定义属性)
+project:
+  security:
+    oauth2: # OAuth2配置
+      client:
+        client-id: oauth2-jwt-client # 对应在OAuth2 Provider端即授权服务器上配置的客户端id
+        client-secret: "123456" # 客户端认证密码，123456
+
+logging:
+  level:
+    com.fandou.coffee.learning.springcloud.oauth2.jwt.client: DEBUG
