@@ -34,3 +34,21 @@ spring:
         prefix: config # 标识当前应用配置的key的前缀
         profile-separator: ":" # 配置文件分隔符，即key中，分隔符后的字符串就是要激活的profile名称
         data-key: data # 配置数据的开始，key的结束，之后就是配置的属性内容
+
+# actuator配置
+management:
+  # 配置端点
+  endpoint:
+    health:
+      show-details: ALWAYS # 健康信息端点显示详情
+    shutdown:
+      enabled: false # 是否开启关闭应用的端点
+
+  # 曝露断点（配置）
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  file: D:/tmp/logs/spring-cloud-learning/${spring.application.name}.log

@@ -1,0 +1,21 @@
+# 服务器信息
+server:
+  address: localhost
+  port: 5998
+
+# spring应用信息
+spring:
+  application:
+    name: oauth2-jwt-client
+
+# eureka设置
+eureka:
+  instance:
+    hostname: ${server.address}
+    instance-id: ${spring.application.name}:${server.address}:${server.port}
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:2000/eureka # 注册中心服务地址
+
+logging:
+  file: D:/tmp/logs/spring-cloud-learning/${spring.application.name}.log

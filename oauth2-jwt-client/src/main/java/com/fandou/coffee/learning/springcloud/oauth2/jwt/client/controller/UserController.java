@@ -2,6 +2,8 @@ package com.fandou.coffee.learning.springcloud.oauth2.jwt.client.controller;
 
 import com.fandou.coffee.learning.springcloud.oauth2.jwt.client.model.User;
 import com.fandou.coffee.learning.springcloud.oauth2.jwt.client.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -17,6 +19,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 public class UserController {
+
+    // 日志
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private UserService userService;
@@ -65,7 +70,11 @@ public class UserController {
      */
     @GetMapping("/read/{message}")
     public String echo(@PathVariable("message") String message){
-        System.out.printf("收到消息：%s\n",message);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("收到消息：{}",message);
+        }
+
         return message;
     }
 
@@ -77,7 +86,11 @@ public class UserController {
      */
     @GetMapping("/write")
     public String wrap(@RequestParam("message") String message){
-        System.out.printf("收到消息：%s\n",message);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("收到消息：{}",message);
+        }
+
         return String.format("{%s}",message);
     }
 
@@ -91,9 +104,13 @@ public class UserController {
      */
     @GetMapping("/principal")
     public OAuth2Authentication getPrincipal(OAuth2Authentication oAuth2Authentication, Principal principal, Authentication authentication){
-        System.out.printf("oAuth2Authentication => %s\n",oAuth2Authentication);
-        System.out.printf("principal => %s\n",principal);
-        System.out.printf("authentication => %s\n",authentication);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("oAuth2Authentication => {}",oAuth2Authentication);
+            LOGGER.debug("principal => {}",principal);
+            LOGGER.debug("authentication => {}",authentication);
+        }
+
         return oAuth2Authentication;
     }
 
@@ -106,7 +123,11 @@ public class UserController {
     @GetMapping("/name")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')") // 增加角色限制
     public String getName(Principal principal){
-        System.out.printf("用户名字：%s\n",principal.getName());
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("用户名字 => {}",principal.getName());
+        }
+
         return principal.getName();
     }
 }

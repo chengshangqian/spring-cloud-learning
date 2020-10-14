@@ -1,6 +1,8 @@
 package com.fandou.coffee.learning.springcloud.microservice.consumer.service;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,8 @@ import org.springframework.web.client.RestTemplate;
  */
 @Service("lbrestWaitressService")
 public class LoadbalanceRestWaitressServiceImpl extends AbstractWaitressService {
+    // 日志
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoadbalanceRestWaitressServiceImpl.class);
 
     // 服务名称或消费提供方：硬编码仅作测试
     private final String serviceId = "micro-service-provider";
@@ -36,7 +40,12 @@ public class LoadbalanceRestWaitressServiceImpl extends AbstractWaitressService 
     public String doGreeting(String visitor){
         // Eureka会根据Ribbon中默认或自定义的负载均衡策略解析为正确的服务提供者
         // 由于使用了Eureka发现服务，此时不需要在定义为具体的远程服务主机地址，而是使用服务名称serviceId进行调用
-        String url = "http://" + serviceId + "/greeting/" + visitor;
+        String url = String.format("http://%s/greeting/%s",serviceId,visitor);
+
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("url => {}",url);
+        }
+
         return lbRestTemplate.getForObject(url,String.class);
     }
 
@@ -46,8 +55,12 @@ public class LoadbalanceRestWaitressServiceImpl extends AbstractWaitressService 
      * @return
      */
     public String greetingMock(String visitor){
-        System.out.printf("visitor => %s\n" , visitor);
+
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("visitor => {}",visitor);
+        }
+
         // 返回友好提示
-        return "Hello," + visitor + "! The Application is busy now, you can try again later! ";
+        return String.format("Hello, %s! The Application is busy now, you can try again later! ",visitor);
     }
 }

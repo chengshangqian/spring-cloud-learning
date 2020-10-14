@@ -1,12 +1,5 @@
-# 服务器信息
-server:
-  address: localhost
-  port: 80
-
 # spring应用信息
 spring:
-  application:
-    name: gateway-server
    # 指定激活的profile配置
   profiles:
     active: discovery # 如果配置了多个，比如directUri,discovery，相同的属性只有最后一个有效

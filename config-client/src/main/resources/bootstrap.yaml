@@ -30,3 +30,6 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:2000/eureka # 注册中心服务地址，集群用逗号分隔
+
+logging:
+  file: D:/tmp/logs/spring-cloud-learning/${spring.application.name}.log

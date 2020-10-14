@@ -1,13 +1,5 @@
-# 服务器信息
-server:
-  address: localhost
-  port: 80
-
 # spring应用信息
 spring:
-  application:
-    name: consul-gateway-server
-
   # cloud设置
   cloud:
     loadbalancer:

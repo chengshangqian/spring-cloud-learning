@@ -1,6 +1,8 @@
 package com.fandou.coffee.learning.springcloud.microservice.provider.controller;
 
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -12,6 +14,9 @@ import org.springframework.web.client.RestTemplate;
 @RequestMapping("/consumer")
 public class ConsumerController {
 
+    // 日志
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConsumerController.class);
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -22,22 +27,26 @@ public class ConsumerController {
      */
     @GetMapping("/{service}/{path}")
     @HystrixCommand(fallbackMethod = "invokeConsumerServiceMock")
-    public String invokeConsumerService(@PathVariable("service") String service,@PathVariable(value = "path") String path,@RequestParam(value = "protocol",required = false) String protocol){
+    public String invokeConsumerService(@PathVariable("service") String service, @PathVariable(value = "path") String path, @RequestParam(value = "protocol", required = false) String protocol) {
 
-        if(protocol == null){
+        if (protocol == null) {
             protocol = "http";
         }
 
         assert null != service;
         assert null != path;
 
-        if(path.startsWith("/")){
+        if (path.startsWith("/")) {
             path = path.substring(1);
         }
 
-        String url = String.format("%s://%s/%s",protocol,service,path);
+        String url = String.format("%s://%s/%s", protocol, service, path);
 
-        return restTemplate.getForObject(url,String.class);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("url => {}", url);
+        }
+
+        return restTemplate.getForObject(url, String.class);
     }
 
     /**
@@ -48,8 +57,12 @@ public class ConsumerController {
      * @param protocol
      * @return
      */
-    public String invokeConsumerServiceMock(String service, String path, String protocol){
-        System.out.printf("{protocol -> %s, service -> %s, path -> %s}\n" , protocol,service,path);
+    public String invokeConsumerServiceMock(String service, String path, String protocol) {
+
+        if (LOGGER.isWarnEnabled()) {
+            LOGGER.warn("服务发生熔断 => {protocol -> {}, service -> {}, path -> {}}", protocol, service, path);
+        }
+
         return "服务器繁忙，请稍后再试.";
     }
 }

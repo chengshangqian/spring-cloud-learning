@@ -9,6 +9,6 @@ import org.springframework.stereotype.Service;
 public class GreetingServiceMock implements GreetingService {
     @Override
     public String greeting(String visitor) {
-        return "Hello," + visitor + "! The application is busy now, you can try again later! Thank you!";
+        return String.format("Hello, %s! The application is busy now, you can try again later! Thank you!",visitor);
     }
 }

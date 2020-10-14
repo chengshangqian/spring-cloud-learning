@@ -1,27 +1,10 @@
-# 服务器信息
-server:
-  address: localhost
-  port: 4998
-
 # spring应用信息
 spring:
-  application:
-    name: oauth2-client
-
   # cloud设置
   cloud:
     loadbalancer:
       ribbon:
         enabled: false # 关闭负载均衡器的ribbon，解决一些警告
-
-# eureka设置
-eureka:
-  instance:
-    hostname: ${server.address}
-    instance-id: ${spring.application.name}:${server.address}:${server.port}
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:2000/eureka # 注册中心服务地址
 
 # security配置
 security:
@@ -37,7 +20,3 @@ security:
       access-token-uri: http://${security.oauth2.provider.address}/uaa/oauth/token # 授权服务器申请访问令牌的uri
       grant-type: client_credentials,refresh_token,password # 客户端权限
       scope: server # 约定作用域，支持多个
-
-logging:
-  level:
-    com.fandou.coffee.learning.springcloud.oauth2.client: DEBUG

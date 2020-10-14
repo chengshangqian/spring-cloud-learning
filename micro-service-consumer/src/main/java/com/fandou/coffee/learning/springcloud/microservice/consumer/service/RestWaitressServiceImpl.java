@@ -1,5 +1,7 @@
 package com.fandou.coffee.learning.springcloud.microservice.consumer.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -11,6 +13,8 @@ import org.springframework.web.client.RestTemplate;
  */
 @Service("restWaitressService")
 public class RestWaitressServiceImpl extends AbstractWaitressService {
+    // 日志
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestWaitressServiceImpl.class);
 
     // 服务名称或消费提供方：硬编码仅作测试
     private final String serviceHost = "localhost:8080";
@@ -29,7 +33,12 @@ public class RestWaitressServiceImpl extends AbstractWaitressService {
     public String doGreeting(String visitor) {
         // 使用普通的restTemplate调用远程服务
         // 需要使用服务提供者的具体主机地址serviceHost，不涉及服务注册和发现，只是普通的http调用
-        String url = "http://" + serviceHost + "/greeting/" + visitor;
+        String url = String.format("http://%s/greeting/%s",serviceHost,visitor);
+
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("url => {}",url);
+        }
+
         return restTemplate.getForObject(url,String.class);
     }
 }

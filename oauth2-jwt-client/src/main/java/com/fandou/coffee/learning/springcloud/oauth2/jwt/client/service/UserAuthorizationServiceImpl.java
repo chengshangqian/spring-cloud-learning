@@ -5,6 +5,8 @@ import com.fandou.coffee.learning.springcloud.oauth2.jwt.client.model.JwtAccessT
 import com.fandou.coffee.learning.springcloud.oauth2.jwt.client.model.User;
 import com.fandou.coffee.learning.springcloud.oauth2.jwt.client.model.UserDTO;
 import com.fandou.coffee.learning.springcloud.oauth2.jwt.client.service.remote.Oauth2Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +17,9 @@ import java.util.Base64;
 
 @Service
 public class UserAuthorizationServiceImpl implements UserAuthorizationService {
+    // 日志
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserAuthorizationServiceImpl.class);
+
     @Autowired
     private UserService userService;
 
@@ -57,6 +62,11 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
         String authorization = String.format("Basic %s",clientAccessToken); // 安全认证请求头信息，token类型为Basic，即HttpBasic认证
 
         String grantType = "password"; // 认证登录使用password类型
+
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("clientDetails -> {}, clientAccessToken -> {}",clientDetails,clientAccessToken);
+            LOGGER.debug("authorization -> {}, grantType -> {}, username -> {}, password -> {}",authorization, grantType, username,password);
+        }
 
         // jwt格式的访问令牌
         JwtAccessToken jwtAccessToken = oauth2Service.getAccessToken(authorization, grantType, username, password);

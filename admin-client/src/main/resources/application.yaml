@@ -1,16 +1,11 @@
 # 服务器信息
 server:
-  address: localhost
-  port: 5001
   servlet:
     session:
       timeout: 3600 # 支持JDB8中Duration类格式的事件，否则为秒
 
 # spring应用信息
 spring:
-  application:
-    name: admin-client
-
   # 数据源配置
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
@@ -61,34 +56,3 @@ spring:
     servlet:
       content-type: text/html
     suffix: .html
-
-# eureka设置
-eureka:
-  instance:
-    hostname: ${server.address} # 如果SpringBootAdmin服务端和客户端不在同一台机，这里需要注册为可通讯的IP地址
-    lease-renewal-interval-in-seconds: 10
-    health-check-url-path: /actuator/health
-    instance-id: ${spring.application.name}:${server.address}:${server.port}
-  client:
-    registry-fetch-interval-seconds: 5
-    serviceUrl:
-      defaultZone: http://localhost:2000/eureka # 注册中心服务地址
-
-# actuator配置
-management:
-  # 配置端点
-  endpoint:
-    health:
-      show-details: ALWAYS # 健康信息端点显示详情
-    shutdown:
-      enabled: false # 是否开启关闭应用的端点
-
-  # 曝露断点（配置）
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-
-logging:
-  level:
-    com.fandou.coffee.learning.springcloud.admin.client: DEBUG

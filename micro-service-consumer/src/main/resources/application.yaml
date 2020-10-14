@@ -1,13 +1,5 @@
-# 服务器信息
-server:
-  address: localhost
-  port: 8082
-
 # spring应用信息
 spring:
-  application:
-    name: micro-service-consumer
-
   # sleuth设置
   sleuth:
     web:
@@ -34,32 +26,6 @@ spring:
     loadbalancer:
       ribbon:
         enabled: false # 关闭负载均衡器的ribbon，解决一些警告
-
-# eureka设置
-eureka:
-  instance:
-    hostname: ${server.address}
-    instance-id: ${spring.application.name}:${server.address}:${server.port}
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:2000/eureka # 注册中心服务地址，集群用逗号分隔
-
-# actuator监控管理配置
-management:
-  # 配置端点
-  endpoint:
-    health:
-      show-details: ALWAYS # 健康信息端点显示详情
-    shutdown:
-      enabled: false # 开启关闭应用的端点
-
-  # 曝露断点（配置）
-  endpoints:
-    web:
-      exposure:
-        include: "*" # 曝露所有端点
-  security:
-    enabled: false
 
 # ribbon负载均衡设置
 #ribbon:

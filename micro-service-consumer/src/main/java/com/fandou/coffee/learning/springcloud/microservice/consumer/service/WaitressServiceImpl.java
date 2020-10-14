@@ -1,6 +1,8 @@
 package com.fandou.coffee.learning.springcloud.microservice.consumer.service;
 
 import com.fandou.coffee.learning.springcloud.microservice.consumer.service.remote.GreetingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -13,13 +15,20 @@ import org.springframework.stereotype.Service;
 @Service
 @Primary
 public class WaitressServiceImpl implements WaitressService {
+    // 日志
+    private static final Logger LOGGER = LoggerFactory.getLogger(WaitressServiceImpl.class);
 
     @Autowired
     private GreetingService greetingService; // openfeign远程服务接口
 
     @Override
     public String greeting(String visitor) {
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("visitor => {}",visitor);
+        }
+
         String greeting = greetingService.greeting(visitor);
+
         return String.format("%s What can i help you?", greeting);
     }
 }

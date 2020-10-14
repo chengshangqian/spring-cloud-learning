@@ -1,5 +1,7 @@
 package com.fandou.coffee.learning.springcloud.oauth2.client.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -14,6 +16,9 @@ import java.security.Principal;
 @RequestMapping("/echos")
 public class EchoController {
 
+    // 日志
+    private static final Logger LOGGER = LoggerFactory.getLogger(EchoController.class);
+
     /**
      * 原样打印并返回消息：不需要授权即可访问
      *
@@ -22,7 +27,11 @@ public class EchoController {
      */
     @GetMapping("/{message}")
     public String echo(@PathVariable("message") String message){
-        System.out.printf("收到消息：%s\n",message);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("收到消息：{}",message);
+        }
+
         return message;
     }
 
@@ -34,7 +43,11 @@ public class EchoController {
      */
     @GetMapping("/wrap")
     public String wrap(@RequestParam("message") String message){
-        System.out.printf("收到消息：%s\n",message);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("收到消息：{}",message);
+        }
+
         return message;
     }
 
@@ -48,9 +61,13 @@ public class EchoController {
      */
     @GetMapping("/principal")
     public OAuth2Authentication getPrincipal(OAuth2Authentication oAuth2Authentication, Principal principal, Authentication authentication){
-        System.out.printf("oAuth2Authentication => %s\n",oAuth2Authentication);
-        System.out.printf("principal => %s\n",principal);
-        System.out.printf("authentication => %s\n",authentication);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("oAuth2Authentication => {}",oAuth2Authentication);
+            LOGGER.debug("principal => {}",principal);
+            LOGGER.debug("authentication => {}",authentication);
+        }
+
         return oAuth2Authentication;
     }
 
@@ -63,7 +80,11 @@ public class EchoController {
     @GetMapping("/name")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')") // 增加角色限制
     public String getName(Principal principal){
-        System.out.printf("用户名字：%s\n",principal.getName());
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("用户名字 => {}",principal.getName());
+        }
+
         return principal.getName();
     }
 }
