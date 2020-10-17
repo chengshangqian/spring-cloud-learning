@@ -1,2 +1,2 @@
-# spring-cloud-learning
-SpringCloud入门学习案例
+# SpringCloud入门学习案例
+系统学习使用SpringCloud构建分布式微服务系统的各种常用组件的使用，包括注册中心eureak和consul，负载均衡ribbon，声明式远程调用openfeign，网关zuul和gateway，配置中心config，熔断器hystrix及其监控面板、链路追踪Sleuth、微服务监控spring-boot-admin、微服务安全保护spring-security-oauth2等内容
