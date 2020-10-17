@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.fandou.coffee.learning</groupId>
+    <artifactId>spring-cloud-learning</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>eureka-server</module>
+        <module>micro-service-common</module>
+        <module>micro-service-provider</module>
+        <module>micro-service-consumer</module>
+        <module>monitor-server</module>
+        <module>zuul-server</module>
+        <module>gateway-server</module>
+        <module>consul-micro-service-provider</module>
+        <module>consul-micro-service-consumer</module>
+        <module>consul-micro-service-common</module>
+        <module>config-server</module>
+        <module>config-client</module>
+        <module>consul-gateway-server</module>
+        <module>admin-server</module>
+        <module>admin-client</module>
+        <module>oauth2-provider</module>
+        <module>oauth2-client</module>
+        <module>oauth2-jwt-provider</module>
+        <module>oauth2-jwt-client</module>
+        <module>pom-parent</module>
+    </modules>
+
+</project>
